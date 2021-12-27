@@ -27,6 +27,7 @@ class Subscription extends AuthorizeNet
         $creditCard = new AnetAPI\CreditCardType();
         $creditCard->setCardNumber($data['cardNumber']);
         $creditCard->setExpirationDate($data['cardExpiry']);
+        if(isset($data['cardCode'])) { $creditCard->setCardCode($data['cardCode']); }
 
         $payment = new AnetAPI\PaymentType();
         $payment->setCreditCard($creditCard);
@@ -45,6 +46,10 @@ class Subscription extends AuthorizeNet
         $billTo = new AnetAPI\NameAndAddressType();
         $billTo->setFirstName($data['customerFirstName']);
         $billTo->setLastName($data['customerLastName']);
+        if(isset($data['customerAddress'])) { $billTo->setAddress($data['customerAddress']); }
+        if(isset($data['customerCity'])) { $billTo->setCity($data['customerCity']); }
+        if(isset($data['customerState'])) { $billTo->setState($data['customerState']); }
+        if(isset($data['customerZip'])) { $billTo->setZip($data['customerZip']); }
 
         $subscription->setBillTo($billTo);
 
