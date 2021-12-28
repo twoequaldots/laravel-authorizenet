@@ -43,6 +43,12 @@ class Subscription extends AuthorizeNet
         $order->setDescription($data['subscriptionDescription']);
         $subscription->setOrder($order);
 
+        if(isset($data['customerProfileId'])) {
+            $profile = new AnetAPI\CustomerProfileIdType();
+            $profile->setCustomerProfileId($data['customerProfileId']);
+            $subscription->setProfile($profile);
+        }
+
         $billTo = new AnetAPI\NameAndAddressType();
         $billTo->setFirstName($data['customerFirstName']);
         $billTo->setLastName($data['customerLastName']);
