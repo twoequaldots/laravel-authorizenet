@@ -18,8 +18,37 @@ class PaymentProfile extends AuthorizeNet
         $paymentType = new AnetAPI\PaymentType();
         $paymentType->setOpaqueData($opaqueDataType);
 
+        $billTo = new AnetAPI\CustomerAddressType();
+
+        if ($source['first_name']) {
+            $billTo->setFirstName($source['first_name']);
+        }
+
+        if ($source['last_name']) {
+            $billTo->setLastName($source['last_name']);
+        }
+
+        if ($source['address']) {
+            $billTo->setAddress($source['address']);
+        }
+
+        if ($source['city']) {
+            $billTo->setCity($source['city']);
+        }
+
+        if ($source['state']) {
+            $billTo->setState($source['state']);
+        }
+
+        if ($source['zip']) {
+            $billTo->setZip($source['zip']);
+        }
+
+
+
         $customerPaymentProfileType = new AnetAPI\CustomerPaymentProfileType;
         $customerPaymentProfileType->setPayment($paymentType);
+        $customerPaymentProfileType->setBillTo($billTo);
 
         // Assemble the complete transaction request
         $paymentProfileRequest = new AnetAPI\CreateCustomerPaymentProfileRequest();
@@ -47,12 +76,16 @@ class PaymentProfile extends AuthorizeNet
      */
     public function storeInDatabase($response, $source)
     {
+        // DAVID_TODO: Look to see if we can use Eloquent instead of Query Builder
+        // May require us to package Models inside this laravel package
         return \DB::table('user_payment_profiles')->insert([
             'user_id'               => $this->user->id,
             'payment_profile_id'    => $response->getCustomerPaymentProfileId(),
             'last_4'                => $source['last_4'],
             'brand'                 => $source['brand'],
-            'type'                  => $source['type']
+            'type'                  => $source['type'],
+            'created_at'            => \Carbon\Carbon::now(),
+            'updated_at'            => \Carbon\Carbon::now()
         ]);
     }
 
