@@ -57,9 +57,13 @@ class CustomerProfile extends AuthorizeNet {
      */
     protected function persistInDatabase(string $customerProfileId) : bool
     {
+        // DAVID_TODO: See if we can use Eloquent instead of Query Builder
+        // May need to use Models inside this laravel package
         return DB::table('user_gateway_profiles')->insert([
             'profile_id' => $customerProfileId,
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
+            'created_at' => \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now()
         ]);
     }
 
