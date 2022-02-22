@@ -27,7 +27,6 @@ class Subscription extends AuthorizeNet
         $creditCard = new AnetAPI\CreditCardType();
         $creditCard->setCardNumber($data['cardNumber']);
         $creditCard->setExpirationDate($data['cardExpiry']);
-        if(isset($data['cardCode'])) { $creditCard->setCardCode($data['cardCode']); }
 
         $payment = new AnetAPI\PaymentType();
         $payment->setCreditCard($creditCard);
@@ -43,21 +42,55 @@ class Subscription extends AuthorizeNet
         $order->setDescription($data['subscriptionDescription']);
         $subscription->setOrder($order);
 
-        if(isset($data['customerProfileId'])) {
-            $profile = new AnetAPI\CustomerProfileIdType();
-            $profile->setCustomerProfileId($data['customerProfileId']);
-            $subscription->setProfile($profile);
-        }
-
         $billTo = new AnetAPI\NameAndAddressType();
         $billTo->setFirstName($data['customerFirstName']);
         $billTo->setLastName($data['customerLastName']);
-        if(isset($data['customerAddress'])) { $billTo->setAddress($data['customerAddress']); }
-        if(isset($data['customerCity'])) { $billTo->setCity($data['customerCity']); }
-        if(isset($data['customerState'])) { $billTo->setState($data['customerState']); }
-        if(isset($data['customerZip'])) { $billTo->setZip($data['customerZip']); }
 
         $subscription->setBillTo($billTo);
+
+        $request = new AnetAPI\ARBCreateSubscriptionRequest();
+        $request->setmerchantAuthentication($this->getMerchantAuthentication());
+        $request->setRefId($this->getRefId());
+        $request->setSubscription($subscription);
+        $controller = new AnetController\ARBCreateSubscriptionController($request);
+        return $this->execute($controller);
+    }
+
+    public function createFromExistingPaymentProfile(array $data)
+    {
+        // Subscription Type Info
+        $subscription = new AnetAPI\ARBSubscriptionType();
+        $subscription->setName($data['name']);
+
+        $interval = new AnetAPI\PaymentScheduleType\IntervalAType();
+        $interval->setLength($data['intervalLength']);
+        $interval->setUnit($data['intervalLengthUnit'] ?? 'days');
+
+        $paymentSchedule = new AnetAPI\PaymentScheduleType();
+        $paymentSchedule->setInterval($interval);
+        $paymentSchedule->setStartDate(new DateTime($data['startDate']));
+        $paymentSchedule->setTotalOccurrences($data['totalOccurrences']);
+        $paymentSchedule->setTrialOccurrences($data['trialOccurrences']);
+
+        $subscription->setPaymentSchedule($paymentSchedule);
+        $subscription->setAmount($data['amountInDollars']);
+        $subscription->setTrialAmount($data['trialAmountInDollars']);
+
+        $order = new AnetAPI\OrderType();
+        $order->setInvoiceNumber($data['invoiceNumber']);
+        $order->setDescription($data['subscriptionDescription']);
+        $subscription->setOrder($order);
+
+        if(isset($data['customerProfileId'])) {
+            $profile = new AnetAPI\CustomerProfileIdType();
+            $profile->setCustomerProfileId($data['customerProfileId']);
+        }
+
+        if(isset($data['customerPaymentProfileId'])) {
+            $profile->setCustomerPaymentProfileId($data['customerPaymentProfileId']);
+        }
+
+        $subscription->setProfile($profile);
 
         $request = new AnetAPI\ARBCreateSubscriptionRequest();
         $request->setmerchantAuthentication($this->getMerchantAuthentication());
