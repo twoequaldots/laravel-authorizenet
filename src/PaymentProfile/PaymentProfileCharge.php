@@ -8,7 +8,7 @@ use ANet\AuthorizeNet;
 
 class PaymentProfileCharge extends AuthorizeNet
 {
-    public function charge(int $cents, int $paymentProfileId) {
+    public function charge(int $cents, int $paymentProfileId, string $transactionType) {
         $amount = $this->convertCentsToDollar($cents);
 
         // Set the transaction's refId
@@ -21,7 +21,7 @@ class PaymentProfileCharge extends AuthorizeNet
         $profileToCharge->setPaymentProfile($paymentProfile);
 
         $transactionRequestType = new AnetAPI\TransactionRequestType();
-        $transactionRequestType->setTransactionType( "authCaptureTransaction");
+        $transactionRequestType->setTransactionType($transactionType);
 
         $transactionRequestType->setAmount($amount);
         $transactionRequestType->setProfile($profileToCharge);

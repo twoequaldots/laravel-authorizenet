@@ -76,11 +76,12 @@ class ANet
     /**
      * @param $cents
      * @param null $paymentProfileId
+     * @param null $transactionType
      * @return
      */
-    public function charge($cents, $paymentProfileId)
+    public function charge($cents, $paymentProfileId, $transactionType)
     {
-        return (new PaymentProfileCharge($this->user))->charge($cents, $paymentProfileId);
+        return (new PaymentProfileCharge($this->user))->charge($cents, $paymentProfileId, $transactionType);
     }
 
     /**
