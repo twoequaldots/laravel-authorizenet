@@ -5,6 +5,7 @@ use ANet\CustomerProfile\CustomerProfile;
 use ANet\PaymentProfile\PaymentProfile;
 use ANet\PaymentProfile\PaymentProfileCharge;
 use ANet\PaymentProfile\PaymentProfileRefund;
+use ANet\PaymentProfile\PaymentTransaction;
 use ANet\Transactions\Card;
 use ANet\Transactions\Transactions;
 use DB;
@@ -93,6 +94,24 @@ class ANet
     public function refund($cents, $refTransId, $paymentProfileId)
     {
         return (new PaymentProfileRefund($this->user))->handle($cents, $refTransId, $paymentProfileId);
+    }
+
+    /**
+     * @param $refTransId
+     * @return mixed
+     */
+    public function capture($refTransId)
+    {
+        return (new PaymentTransaction($this->user))->capture($refTransId);
+    }
+
+    /**
+     * @param $refTransId
+     * @return mixed
+     */
+    public function void($refTransId)
+    {
+        return (new PaymentTransaction($this->user))->void($refTransId);
     }
 
     /**
